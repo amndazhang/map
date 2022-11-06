@@ -67,8 +67,8 @@ labels <- sprintf(
   all_modzcta$MODZCTA, all_modzcta$caserate) %>%
   lapply(htmltools::HTML)
 
-pal <- colorBin(palette = "OrRd", 9, domain = all_modzcta$caserate)
-# pal <- colorNumeric(palette = "OrRd", 9, domain = all_zcta$caserate)
+#pal <- colorBin(palette = "OrRd", 9, domain = all_modzcta$caserate)
+pal <- colorNumeric(palette = "OrRd", 9, domain = all_modzcta$caserate)
 
 map_interactive <- all_modzcta %>%
   st_transform(crs = "+init=epsg:4326") %>%
@@ -76,6 +76,7 @@ map_interactive <- all_modzcta %>%
   addProviderTiles(provider = "CartoDB.Positron") %>%
   addPolygons(label = labels,
               stroke = FALSE,
+              smoothFactor = .5,
               opacity = 1,
               fillOpacity = 0.7,
               fillColor = ~ pal(caserate),
@@ -87,17 +88,7 @@ map_interactive <- all_modzcta %>%
   addLegend("bottomright",
             pal = pal,
             values = ~ caserate,
-            title = "Cases Per 100,000,
-            opacity = 0.7")
+            title = "Cases Per 100,000",
+            opacity = 0.7)
 
-saveWidget(l, "nyc_covid_caserate_map.html")
-
-if (interactive() && Sys.getenv("TERM_PROGRAM") == "vscode") {
-  if ("httpgd" %in% .packages(all.available = TRUE)) {
-    options(vsc.plot = FALSE)
-    options(device = function(...) {
-      httpgd::hgd(silent = TRUE)
-      .vsc.browser(httpgd::hgd_url(history = FALSE), viewer = "Beside")
-    })
-  }
-}
+saveWidget(map_interactive, "nyc_covid_caserate_map.html")
