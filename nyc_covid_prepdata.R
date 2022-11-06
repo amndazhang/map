@@ -3,15 +3,9 @@ library(vroom) #fast reading/importing of data (csv)
 library(sf) #spatial data
 library(tigris) #geojoin
 library(leaflet) #interactive maps
-library(htmlwidgets) #interactive map labels 
+library(htmlwidgets) #interactive map labels
 
-setwd("/Users/amanda/Desktop/map")
-
-### IMPORT DATA
-#download master repo from NYC DoH Github
-download.file(url = "https://github.com/nychealth/coronavirus-data/archive/master.zip", 
-              destfile = "coronavirus-data-master.zip")
-unzip(zipfile = "coronavirus-data-master.zip")
+#setwd("/Users/amanda/Desktop/map")
 
 #read in data
 percentpos <- vroom("coronavirus-data-master/trends/percentpositive-by-modzcta.csv")
@@ -50,13 +44,13 @@ all <- caserates_long %>%
   left_join(testrates_long, by = c("week_ending", "modzcta"))
 
 #merge all covid data w zcta shapefile
-all_modzcta <- geo_join(modzcta, all, 'MODZCTA', 'modzcta', how = "inner")
+all_modzcta <- geo_join(modzcta, all, "MODZCTA", "modzcta", how = "inner")
 
 #NOTE: modzcta and zcta are not the same, as modzctas encompass several small zctas
 #code below would switch between, but multiple zctas can map one modzcta, so leaving lookup table is helpful
 
 #convert week_ending from a character to a date
-all_modzcta$week_ending <-as.Date(all_modzcta$week_ending, format = "%m/%d/%Y")
+all_modzcta$week_ending <- as.Date(all_modzcta$week_ending, format = "%m/%d/%Y")
 
 #save df for Shiny app
 saveRDS(all_modzcta, "all_modzcta.RDS")
@@ -64,8 +58,8 @@ saveRDS(all_modzcta, "all_modzcta.RDS")
 ### DATA INSPECTION
 #check distribution of caserate data
 all_modzcta %>%
-  ggplot(aes(x=as.numeric(caserate))) + 
-  geom_histogram(bins=20, fill='#69b3a2', color='white')
+  ggplot(aes(x = as.numeric(caserate))) +
+  geom_histogram(bins = 20, fill = "white", color = "white")
 
 ### MAKE INTERACTIVE MAP OF CASERATE
 labels <- sprintf(
@@ -82,7 +76,6 @@ map_interactive <- all_modzcta %>%
   addProviderTiles(provider = "CartoDB.Positron") %>%
   addPolygons(label = labels,
               stroke = FALSE,
-              smootherFactor = .5,
               opacity = 1,
               fillOpacity = 0.7,
               fillColor = ~ pal(caserate),
