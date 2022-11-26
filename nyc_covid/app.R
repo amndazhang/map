@@ -12,6 +12,7 @@ library(tidyverse)
 library(leaflet)
 library(htmlwidgets)
 
+setwd("/Users/amanda/Desktop/map/nyc_covid")
 all_modzcta <- readRDS("all_modzcta.RDS")
 
 # Define UI for application that draws a histogram
@@ -20,10 +21,10 @@ ui <- fluidPage(
     # Application title
     titlePanel("COVID-19 NYC Trends by ZCTA"),
 
-    # Sidebar with a slider input for number of bins 
+    # Sidebar with a slider input for number of bins
     sidebarLayout(
         sidebarPanel(
-          tags$a(href="https://github.com/nychealth/coronavirus-data"),
+          tags$a(href = "https://github.com/nychealth/coronavirus-data"),
           h5("All data metrics are aggregated by week (categorized by week). 
              All data sourced from NYC Dep of Health"),
           selectInput("date",
@@ -50,15 +51,15 @@ server <- function(input, output) {
       w <- all_modzcta %>% filter(week_ending == input$date)
       return(w)
     })
-    
+
     output$cases <- renderLeaflet({
       pal <- colorBin(palette = "YlGn", 9, domain = all_modzcta$caserate)
-      
-      labels = sprintf(
+
+      labels <- sprintf(
         "<strong>%s</strong><br/>%g cases per 100,000 people",
         week_zcta()$MODZCTA, week_zcta()$caserate) %>%
         lapply(htmltools::HTML)
-      
+
       week_zcta() %>%
         st_transform(crs = "+init=epsg:4326") %>%
         leaflet() %>%
@@ -81,15 +82,15 @@ server <- function(input, output) {
                   title = "Cases Per 100,000",
                   opacity = 0.7)
     })
-    
+
     output$tests <- renderLeaflet({
       pal <- colorBin(palette = "PuBu", 9, domain = all_modzcta$testrate)
-      
-      labels = sprintf(
+
+      labels <- sprintf(
         "<strong>%s</strong><br/>%g tests per 100,000 people",
         week_zcta()$MODZCTA, week_zcta()$testrate) %>%
         lapply(htmltools::HTML)
-      
+
       week_zcta() %>%
         st_transform(crs = "+init=epsg:4326") %>%
         leaflet() %>%
@@ -112,15 +113,15 @@ server <- function(input, output) {
                   title = "Cases Per 100,000",
                   opacity = 0.7)
     })
-    
+
     output$pctpos <- renderLeaflet({
       pal <- colorBin(palette = "OrRd", 9, domain = all_modzcta$pctpos)
-      
-      labels = sprintf(
+
+      labels <- sprintf(
         "<strong>%s</strong><br/>%g tests per 100,000 people",
         week_zcta()$MODZCTA, week_zcta()$pctpos) %>%
         lapply(htmltools::HTML)
-      
+
       week_zcta() %>%
         st_transform(crs = "+init=epsg:4326") %>%
         leaflet() %>%
@@ -145,5 +146,5 @@ server <- function(input, output) {
     })
 }
 
-# Run the application 
+# Run the application
 shinyApp(ui = ui, server = server)

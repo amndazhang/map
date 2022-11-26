@@ -5,7 +5,7 @@ library(tigris) #geojoin
 library(leaflet) #interactive maps
 library(htmlwidgets) #interactive map labels
 
-#setwd("/Users/amanda/Desktop/map")
+setwd("/Users/amanda/Desktop/map")
 
 #read in data
 percentpos <- vroom("coronavirus-data-master/trends/percentpositive-by-modzcta.csv")
@@ -53,7 +53,7 @@ all_modzcta <- geo_join(modzcta, all, "MODZCTA", "modzcta", how = "inner")
 all_modzcta$week_ending <- as.Date(all_modzcta$week_ending, format = "%m/%d/%Y")
 
 #save df for Shiny app
-saveRDS(all_modzcta, "all_modzcta.RDS")
+saveRDS(all_modzcta, "nyc_covid/all_modzcta.RDS")
 
 ### DATA INSPECTION
 #check distribution of caserate data
